@@ -1,4 +1,6 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";
+
 import { theme } from "../theme";
 
 type Props = {
@@ -40,15 +42,12 @@ export function ShoppingListItem({ name, isCompleted = false }: Props) {
       >
         {name}
       </Text>
-      <TouchableOpacity
-        style={[
-          styles.itemButton,
-          isCompleted ? styles.completedButton : undefined,
-        ]}
-        onPress={() => handleDelete()}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.itemButtonText}>Delete</Text>
+      <TouchableOpacity onPress={() => handleDelete()} activeOpacity={0.8}>
+        <AntDesign
+          name="closecircle"
+          size={24}
+          color={isCompleted ? theme.colorDarkGrey : theme.colorDanger}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -58,7 +57,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     borderBottomWidth: 1,
     borderBottomColor: theme.colorCerulean,
-    paddingHorizontal: 8,
+    paddingHorizontal: 24,
     paddingVertical: 16,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -68,9 +67,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colorLightGrey,
     borderBottomColor: theme.colorLightGrey,
   },
-  completedButton: {
-    backgroundColor: theme.colorDarkGrey,
-  },
   completedText: {
     textDecorationLine: "line-through",
     color: theme.colorDarkGrey,
@@ -79,16 +75,5 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 18,
     fontWeight: 400,
-  },
-  itemButton: {
-    backgroundColor: theme.colorDanger,
-    padding: 8,
-    borderRadius: 4,
-  },
-  itemButtonText: {
-    color: theme.colorWhite,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    letterSpacing: 1,
   },
 });
