@@ -9,6 +9,21 @@ export default function Layout() {
           title: "Shopping List",
         }}
       />
+      <Stack.Screen
+        name="counter"
+        options={{
+          title: "Counter",
+          presentation: "modal",
+          animation: "slide_from_bottom", // not required, default is "slide_from_bottom" in ios
+        }}
+      />
+      <Stack.Screen
+        name="idea"
+        options={{
+          title: "Idea",
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }
