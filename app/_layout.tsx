@@ -23,6 +23,7 @@ export default function Layout() {
         name="counter" // This is the name of the file without the extension
         options={{
           title: "Counter",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="clockcircleo" size={size} color={color} />
           ),
