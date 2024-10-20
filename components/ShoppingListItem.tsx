@@ -1,18 +1,28 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
 import { theme } from "../theme";
+import { Entypo } from "@expo/vector-icons";
 
 type Props = {
   name: string;
   isCompleted?: boolean;
   onDelete: () => void;
+  onToggleComplete: () => void;
 };
 
 export function ShoppingListItem({
   name,
   isCompleted = false,
   onDelete,
+  onToggleComplete,
 }: Props) {
   const handleDelete = () => {
     Alert.alert(
@@ -33,20 +43,29 @@ export function ShoppingListItem({
     );
   };
   return (
-    <View
+    <Pressable
       style={[
         styles.itemContainer,
         isCompleted ? styles.completedContainer : undefined,
       ]}
+      onPress={onToggleComplete}
     >
-      <Text
-        style={[
-          styles.itemText,
-          isCompleted ? styles.completedText : undefined,
-        ]}
-      >
-        {name}
-      </Text>
+      <View style={styles.row}>
+        <Entypo
+          name={isCompleted ? "check" : "circle"}
+          size={24}
+          color={isCompleted ? theme.colorDarkGrey : theme.colorCerulean}
+        />
+        <Text
+          numberOfLines={4}
+          style={[
+            styles.itemText,
+            isCompleted ? styles.completedText : undefined,
+          ]}
+        >
+          {name}
+        </Text>
+      </View>
       <TouchableOpacity onPress={() => handleDelete()} activeOpacity={0.8}>
         <AntDesign
           name="closecircle"
@@ -54,7 +73,7 @@ export function ShoppingListItem({
           color={isCompleted ? theme.colorDarkGrey : theme.colorDanger}
         />
       </TouchableOpacity>
-    </View>
+    </Pressable>
   );
 }
 
@@ -80,5 +99,14 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 18,
     fontWeight: 400,
+    flex: 1,
+  },
+  row: {
+    flexDirection: "row",
+    gap: 12,
+    flex: 1,
+    paddingRight: 24,
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
 });
