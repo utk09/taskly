@@ -6,9 +6,14 @@ import { theme } from "../theme";
 type Props = {
   name: string;
   isCompleted?: boolean;
+  onDelete: () => void;
 };
 
-export function ShoppingListItem({ name, isCompleted = false }: Props) {
+export function ShoppingListItem({
+  name,
+  isCompleted = false,
+  onDelete,
+}: Props) {
   const handleDelete = () => {
     Alert.alert(
       `Delete ${name}?`,
@@ -17,12 +22,12 @@ export function ShoppingListItem({ name, isCompleted = false }: Props) {
         {
           text: "Cancel",
           style: "cancel",
-          onPress: () => console.log("Cancelled!"),
+          onPress: () => console.log("Cancel Pressed"),
         },
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => console.log("Deleting..."),
+          onPress: () => onDelete(),
         },
       ],
     );
