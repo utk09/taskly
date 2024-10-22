@@ -1,16 +1,36 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+
 import { theme } from "../../theme";
 import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotificationsAsync";
 
 export default function CounterScreen() {
-  const handleRequestPermission = async () => {
+  const scheduleNotification = async () => {
     const result = await registerForPushNotificationsAsync();
-    console.log({ result });
+    if (result === "granted") {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Hello",
+          body: "This is a notification from taskly",
+        },
+        trigger: {
+          seconds: 5,
+        },
+      });
+    } else {
+      if (Device.isDevice) {
+        Alert.alert(
+          "Permission Denied",
+          "You need to enable notifications in your settings to use this feature.",
+        );
+      }
+    }
   };
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={handleRequestPermission}>
-        <Text>Request Permission</Text>
+      <TouchableOpacity style={styles.button} onPress={scheduleNotification}>
+        <Text>Schedule Notification</Text>
       </TouchableOpacity>
       <Text style={styles.text}>Counter Screen</Text>
     </View>
