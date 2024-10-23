@@ -1,4 +1,11 @@
-import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { theme } from "../../theme";
 import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotificationsAsync";
 import * as Notifications from "expo-notifications";
@@ -23,6 +30,7 @@ type CountdownStatus = {
 };
 
 export default function CounterScreen() {
+  const [isLoading, setIsLoading] = useState(true);
   const [countdownState, setCountdownState] =
     useState<PersistedCountdownState>();
   const [status, setStatus] = useState<CountdownStatus>({
@@ -38,28 +46,29 @@ export default function CounterScreen() {
     init();
   }, []);
 
-  const lastCompletedAt = countdownState?.completedAtTimestamps[0];
+  const lastCompletedTimestamp = countdownState?.completedAtTimestamps[0];
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      const timestamp = lastCompletedAt
-        ? lastCompletedAt + frequency
+      const timestamp = lastCompletedTimestamp
+        ? lastCompletedTimestamp + frequency
         : Date.now();
+      if (lastCompletedTimestamp) {
+        setIsLoading(false);
+      }
       const isOverdue = isBefore(timestamp, Date.now());
-
       const distance = intervalToDuration(
         isOverdue
           ? { end: Date.now(), start: timestamp }
           : { start: Date.now(), end: timestamp },
       );
-
       setStatus({ isOverdue, distance });
     }, 1000);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [lastCompletedAt]);
+  }, [lastCompletedTimestamp]);
 
   const scheduleNotification = async () => {
     let pushNotificationId;
@@ -92,11 +101,17 @@ export default function CounterScreen() {
         ? [Date.now(), ...countdownState.completedAtTimestamps]
         : [Date.now()],
     };
-
     setCountdownState(newCountdownState);
-
     await saveToStorage(countdownStorageKey, newCountdownState);
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.activityIndicatorContainer}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
   return (
     <View
@@ -176,6 +191,12 @@ const styles = StyleSheet.create({
   },
   whiteText: {
     color: theme.colorWhite,
+  },
+  activityIndicatorContainer: {
+    backgroundColor: theme.colorWhite,
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
   },
 });
 
