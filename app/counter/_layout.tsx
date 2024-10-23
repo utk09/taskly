@@ -1,5 +1,6 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { Link, Stack } from "expo-router";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
 import { theme } from "../../theme";
 import { Pressable } from "react-native";
 
@@ -17,7 +18,7 @@ export default function Layout() {
                   <MaterialIcons
                     name="history"
                     size={32}
-                    color={theme.colorDarkGrey}
+                    color={theme.colorGrey}
                   />
                 </Pressable>
               </Link>
@@ -25,6 +26,7 @@ export default function Layout() {
           },
         }}
       />
+      <Stack.Screen name="history" options={{ title: "History" }} />
     </Stack>
   );
 }

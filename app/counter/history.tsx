@@ -1,5 +1,5 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import { countdownStorageKey, PersistedCountdownState } from ".";
+import { Text, StyleSheet, FlatList, View } from "react-native";
+import { countdownStorageKey, PersistedCountdownState } from "./";
 import { useEffect, useState } from "react";
 import { getFromStorage } from "../../utils/storage";
 import { format } from "date-fns";
@@ -24,11 +24,6 @@ export default function HistoryScreen() {
       style={styles.list}
       contentContainerStyle={styles.contentContainer}
       data={countdownState?.completedAtTimestamps}
-      ListEmptyComponent={
-        <View style={styles.listEmptyContainer}>
-          <Text style={styles.emptyText}>No history</Text>
-        </View>
-      }
       renderItem={({ item }) => (
         <View style={styles.listItem}>
           <Text style={styles.listItemText}>
@@ -36,6 +31,11 @@ export default function HistoryScreen() {
           </Text>
         </View>
       )}
+      ListEmptyComponent={
+        <View style={styles.listEmptyContainer}>
+          <Text>Your shopping list is empty</Text>
+        </View>
+      }
     />
   );
 }
@@ -48,23 +48,20 @@ const styles = StyleSheet.create({
   contentContainer: {
     marginTop: 8,
   },
-  listItem: {
-    backgroundColor: theme.colorGrey,
-    marginHorizontal: 8,
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-  listItemText: {
-    fontSize: 18,
-  },
   listEmptyContainer: {
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 24,
+    marginVertical: 18,
   },
-  emptyText: {
-    fontSize: 24,
-    color: theme.colorDarkGrey,
+  listItem: {
+    marginHorizontal: 8,
+    marginBottom: 8,
+    alignItems: "center",
+    backgroundColor: theme.colorLightGrey,
+    padding: 12,
+    borderRadius: 6,
+  },
+  listItemText: {
+    fontSize: 18,
   },
 });

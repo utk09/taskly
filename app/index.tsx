@@ -1,17 +1,16 @@
 import {
-  FlatList,
   StyleSheet,
-  Text,
   TextInput,
+  FlatList,
   View,
+  Text,
   LayoutAnimation,
 } from "react-native";
-import { useEffect, useState } from "react";
-import * as Haptics from "expo-haptics";
-
-import { ShoppingListItem } from "../components/ShoppingListItem";
 import { theme } from "../theme";
+import { ShoppingListItem } from "../components/ShoppingListItem";
+import { useEffect, useState } from "react";
 import { getFromStorage, saveToStorage } from "../utils/storage";
+import * as Haptics from "expo-haptics";
 
 const storageKey = "shopping-list";
 
@@ -19,15 +18,12 @@ type ShoppingListItemType = {
   id: string;
   name: string;
   completedAtTimestamp?: number;
-  lastUpdatedAtTimestamp: number;
+  lastUpdatedTimestamp: number;
 };
 
-const initialList: ShoppingListItemType[] = [];
-
 export default function App() {
-  const [value, setValue] = useState("");
-  const [shoppingList, setShoppingList] =
-    useState<ShoppingListItemType[]>(initialList);
+  const [shoppingList, setShoppingList] = useState<ShoppingListItemType[]>([]);
+  const [value, setValue] = useState<string>();
 
   useEffect(() => {
     const fetchInitial = async () => {
@@ -37,6 +33,7 @@ export default function App() {
         setShoppingList(data);
       }
     };
+
     fetchInitial();
   }, []);
 
@@ -44,22 +41,21 @@ export default function App() {
     if (value) {
       const newShoppingList = [
         {
-          id: Date.now().toString(),
+          id: new Date().toISOString(),
           name: value,
-          lastUpdatedAtTimestamp: Date.now(),
+          lastUpdatedTimestamp: Date.now(),
         },
         ...shoppingList,
       ];
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setShoppingList(newShoppingList);
       saveToStorage(storageKey, newShoppingList);
-      setValue("");
+      setValue(undefined);
     }
   };
 
   const handleDelete = (id: string) => {
     const newShoppingList = shoppingList.filter((item) => item.id !== id);
-    saveToStorage(storageKey, newShoppingList);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShoppingList(newShoppingList);
@@ -75,13 +71,14 @@ export default function App() {
         }
         return {
           ...item,
-          lastUpdatedAtTimestamp: Date.now(),
           completedAtTimestamp: item.completedAtTimestamp
             ? undefined
             : Date.now(),
+          lastUpdatedTimestamp: Date.now(),
         };
+      } else {
+        return item;
       }
-      return item;
     });
     saveToStorage(storageKey, newShoppingList);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -90,26 +87,25 @@ export default function App() {
 
   return (
     <FlatList
+      ListHeaderComponent={
+        <TextInput
+          value={value}
+          style={styles.textInput}
+          onChangeText={setValue}
+          placeholder="E.g Coffee"
+          onSubmitEditing={handleSubmit}
+          returnKeyType="done"
+        />
+      }
+      ListEmptyComponent={
+        <View style={styles.listEmptyContainer}>
+          <Text>Your shopping list is empty</Text>
+        </View>
+      }
       data={orderShoppingList(shoppingList)}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
-      ListEmptyComponent={
-        <View style={styles.listEmptyContainer}>
-          <Text style={styles.emptyText}>No items</Text>
-        </View>
-      }
-      ListHeaderComponent={
-        <TextInput
-          style={styles.textInput}
-          placeholder="Add item"
-          value={value}
-          onChangeText={setValue}
-          keyboardType="default"
-          returnKeyType="done"
-          onSubmitEditing={handleSubmit}
-        />
-      }
       renderItem={({ item }) => (
         <ShoppingListItem
           name={item.name}
@@ -118,54 +114,54 @@ export default function App() {
           isCompleted={Boolean(item.completedAtTimestamp)}
         />
       )}
-    />
+    ></FlatList>
   );
 }
 
-const orderShoppingList = (shoppingList: ShoppingListItemType[]) => {
+function orderShoppingList(shoppingList: ShoppingListItemType[]) {
   return shoppingList.sort((item1, item2) => {
     if (item1.completedAtTimestamp && item2.completedAtTimestamp) {
       return item2.completedAtTimestamp - item1.completedAtTimestamp;
     }
+
     if (item1.completedAtTimestamp && !item2.completedAtTimestamp) {
       return 1;
     }
+
     if (!item1.completedAtTimestamp && item2.completedAtTimestamp) {
       return -1;
     }
+
     if (!item1.completedAtTimestamp && !item2.completedAtTimestamp) {
-      return item2.lastUpdatedAtTimestamp - item1.lastUpdatedAtTimestamp;
+      return item2.lastUpdatedTimestamp - item1.lastUpdatedTimestamp;
     }
+
     return 0;
   });
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: theme.colorWhite,
-    padding: 16,
+    flex: 1,
+    paddingTop: 12,
   },
   contentContainer: {
     paddingBottom: 24,
   },
   textInput: {
-    borderColor: theme.colorDarkGrey,
-    backgroundColor: theme.colorWhite,
+    borderColor: theme.colorLightGrey,
     borderWidth: 2,
     padding: 12,
-    marginHorizontal: 12,
-    marginBottom: 12,
     fontSize: 18,
     borderRadius: 50,
+    marginHorizontal: 12,
+    marginBottom: 12,
+    backgroundColor: theme.colorWhite,
   },
   listEmptyContainer: {
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 24,
-  },
-  emptyText: {
-    fontSize: 24,
-    color: theme.colorDarkGrey,
+    marginVertical: 18,
   },
 });

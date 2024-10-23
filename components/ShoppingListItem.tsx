@@ -1,15 +1,15 @@
 import {
-  Alert,
-  Pressable,
-  StyleSheet,
-  Text,
   TouchableOpacity,
   View,
+  Alert,
+  StyleSheet,
+  Text,
+  Pressable,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-
+import Entypo from "@expo/vector-icons/Entypo";
 import { theme } from "../theme";
-import { Entypo } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 
 type Props = {
   name: string;
@@ -20,28 +20,26 @@ type Props = {
 
 export function ShoppingListItem({
   name,
-  isCompleted = false,
+  isCompleted,
   onDelete,
   onToggleComplete,
 }: Props) {
   const handleDelete = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
-      `Delete ${name}?`,
-      "Are you sure you want to delete this item?",
+      `Are you sure you want to delete ${name}?`,
+      "It will be gone for good",
       [
         {
-          text: "Cancel",
-          style: "cancel",
-          onPress: () => console.log("Cancel Pressed"),
-        },
-        {
-          text: "Delete",
-          style: "destructive",
+          text: "Yes",
           onPress: () => onDelete(),
+          style: "destructive",
         },
+        { text: "Cancel", style: "cancel" },
       ],
     );
   };
+
   return (
     <Pressable
       style={[
@@ -54,10 +52,9 @@ export function ShoppingListItem({
         <Entypo
           name={isCompleted ? "check" : "circle"}
           size={24}
-          color={isCompleted ? theme.colorDarkGrey : theme.colorCerulean}
+          color={isCompleted ? theme.colorGrey : theme.colorCerulean}
         />
         <Text
-          numberOfLines={4}
           style={[
             styles.itemText,
             isCompleted ? styles.completedText : undefined,
@@ -66,11 +63,11 @@ export function ShoppingListItem({
           {name}
         </Text>
       </View>
-      <TouchableOpacity onPress={() => handleDelete()} activeOpacity={0.8}>
+      <TouchableOpacity hitSlop={20} onPress={handleDelete}>
         <AntDesign
           name="closecircle"
           size={24}
-          color={isCompleted ? theme.colorDarkGrey : theme.colorDanger}
+          color={isCompleted ? theme.colorGrey : theme.colorRed}
         />
       </TouchableOpacity>
     </Pressable>
@@ -79,34 +76,32 @@ export function ShoppingListItem({
 
 const styles = StyleSheet.create({
   itemContainer: {
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colorCerulean,
-    paddingHorizontal: 24,
     paddingVertical: 16,
+    paddingHorizontal: 18,
+    borderBottomColor: theme.colorCerulean,
+    borderBottomWidth: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "space-between",
+  },
+  itemText: {
+    fontSize: 18,
+    fontWeight: "200",
+    marginLeft: 8,
+    flex: 1,
   },
   completedContainer: {
     backgroundColor: theme.colorLightGrey,
     borderBottomColor: theme.colorLightGrey,
   },
   completedText: {
+    color: theme.colorGrey,
     textDecorationLine: "line-through",
-    color: theme.colorDarkGrey,
-    fontWeight: 200,
-  },
-  itemText: {
-    fontSize: 18,
-    fontWeight: 400,
-    flex: 1,
+    textDecorationColor: theme.colorGrey,
   },
   row: {
     flexDirection: "row",
-    gap: 12,
     flex: 1,
-    paddingRight: 24,
     alignItems: "center",
-    justifyContent: "flex-start",
   },
 });

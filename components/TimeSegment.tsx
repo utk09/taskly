@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextStyle, View } from "react-native";
+import { Text, View, StyleSheet, TextStyle } from "react-native";
 
 type Props = {
   number: number;

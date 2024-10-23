@@ -1,10 +1,9 @@
 export const theme = {
   colorCerulean: "#1a759f",
-  colorWhite: "#ffffff",
-  colorBlack: "#000000",
-  colorDanger: "#ca0202",
-  colorRed: "#ff5757",
-  colorGrey: "#f5f5f5",
-  colorLightGrey: "#eeeeee",
+  colorWhite: "#fff",
+  colorBlack: "#000",
+  colorGrey: "grey",
+  colorLightGrey: "#eee",
   colorDarkGrey: "#828282",
+  colorRed: "#ee6055",
 };

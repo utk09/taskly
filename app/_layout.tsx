@@ -1,26 +1,23 @@
-import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import Feather from "@expo/vector-icons/Feather";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { theme } from "../theme";
 
 export default function Layout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: theme.colorCerulean,
-        tabBarInactiveTintColor: theme.colorDarkGrey,
-      }}
-    >
+    <Tabs screenOptions={{ tabBarActiveTintColor: theme.colorCerulean }}>
       <Tabs.Screen
-        name="index" // This is the name of the file without the extension
+        name="index"
         options={{
-          title: "Shopping List",
+          title: "Shopping list",
           tabBarIcon: ({ color, size }) => (
             <Feather name="list" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="counter" // This is the name of the file without the extension
+        name="counter"
         options={{
           title: "Counter",
           headerShown: false,
@@ -32,10 +29,10 @@ export default function Layout() {
       <Tabs.Screen
         name="idea"
         options={{
-          title: "Idea",
-          tabBarIcon: ({ color, size }) => {
-            return <FontAwesome6 name="lightbulb" size={size} color={color} />;
-          },
+          title: "My idea",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome5 name="lightbulb" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>

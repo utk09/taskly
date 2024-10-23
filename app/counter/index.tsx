@@ -4,20 +4,19 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  ActivityIndicator,
-  useWindowDimensions,
+  Dimensions,
 } from "react-native";
 import { theme } from "../../theme";
 import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotificationsAsync";
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef, useState } from "react";
-import * as Haptics from "expo-haptics";
-import ConfettiCannon from "react-native-confetti-cannon";
 import { intervalToDuration, isBefore } from "date-fns";
 import { TimeSegment } from "../../components/TimeSegment";
 import { getFromStorage, saveToStorage } from "../../utils/storage";
+import * as Haptics from "expo-haptics";
+import ConfettiCannon from "react-native-confetti-cannon";
 
-// 10 seconds in ms
+// 2 weeks in ms
 const frequency = 14 * 24 * 60 * 60 * 1000;
 
 export const countdownStorageKey = "taskly-countdown";
@@ -33,9 +32,7 @@ type CountdownStatus = {
 };
 
 export default function CounterScreen() {
-  const { width } = useWindowDimensions();
   const confettiRef = useRef<ConfettiCannon | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [countdownState, setCountdownState] =
     useState<PersistedCountdownState>();
   const [status, setStatus] = useState<CountdownStatus>({
@@ -51,39 +48,38 @@ export default function CounterScreen() {
     init();
   }, []);
 
-  const lastCompletedTimestamp = countdownState?.completedAtTimestamps[0];
+  const lastCompletedAt = countdownState?.completedAtTimestamps[0];
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      const timestamp = lastCompletedTimestamp
-        ? lastCompletedTimestamp + frequency
+      const timestamp = lastCompletedAt
+        ? lastCompletedAt + frequency
         : Date.now();
-      if (lastCompletedTimestamp) {
-        setIsLoading(false);
-      }
       const isOverdue = isBefore(timestamp, Date.now());
+
       const distance = intervalToDuration(
         isOverdue
           ? { end: Date.now(), start: timestamp }
           : { start: Date.now(), end: timestamp },
       );
+
       setStatus({ isOverdue, distance });
     }, 1000);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [lastCompletedTimestamp]);
+  }, [lastCompletedAt]);
 
   const scheduleNotification = async () => {
-    confettiRef?.current?.start();
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    confettiRef?.current?.start();
     let pushNotificationId;
     const result = await registerForPushNotificationsAsync();
     if (result === "granted") {
       pushNotificationId = await Notifications.scheduleNotificationAsync({
         content: {
-          title: "The thing is due!",
+          title: "Car wash overdue!",
         },
         trigger: {
           seconds: frequency / 1000,
@@ -108,17 +104,11 @@ export default function CounterScreen() {
         ? [Date.now(), ...countdownState.completedAtTimestamps]
         : [Date.now()],
     };
+
     setCountdownState(newCountdownState);
+
     await saveToStorage(countdownStorageKey, newCountdownState);
   };
-
-  if (isLoading) {
-    return (
-      <View style={styles.activityIndicatorContainer}>
-        <ActivityIndicator />
-      </View>
-    );
-  }
 
   return (
     <View
@@ -128,9 +118,11 @@ export default function CounterScreen() {
       ]}
     >
       {!status.isOverdue ? (
-        <Text style={[styles.heading]}>Thing due in</Text>
+        <Text style={[styles.heading]}>Next car wash due in</Text>
       ) : (
-        <Text style={[styles.heading, styles.whiteText]}>Thing overdue by</Text>
+        <Text style={[styles.heading, styles.whiteText]}>
+          Car wash overdue by
+        </Text>
       )}
       <View style={styles.row}>
         <TimeSegment
@@ -159,12 +151,12 @@ export default function CounterScreen() {
         style={styles.button}
         activeOpacity={0.8}
       >
-        <Text style={styles.buttonText}>I've done the thing!</Text>
+        <Text style={styles.buttonText}>I've washed the car!</Text>
       </TouchableOpacity>
       <ConfettiCannon
         ref={confettiRef}
         count={50}
-        origin={{ x: width / 2, y: -20 }}
+        origin={{ x: Dimensions.get("window").width / 2, y: -30 }}
         autoStart={false}
         fadeOut={true}
       />
@@ -206,13 +198,4 @@ const styles = StyleSheet.create({
   whiteText: {
     color: theme.colorWhite,
   },
-  activityIndicatorContainer: {
-    backgroundColor: theme.colorWhite,
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
 });
-
-// const navigation = useNavigation();
-// onPress = {() => navigation.navigate("Idea")}
